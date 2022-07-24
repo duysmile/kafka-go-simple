@@ -6,7 +6,6 @@ import (
 )
 
 type KafkaHandler struct {
-	ctx             context.Context
 	sub             Subscriber
 	mapTopicHandler map[string]Handler
 	locker          sync.Mutex
@@ -17,9 +16,8 @@ type Handler interface {
 	IsSync() bool
 }
 
-func NewKafkaConsumeRunner(ctx context.Context, sub Subscriber) *KafkaHandler {
+func NewKafkaConsumeRunner(sub Subscriber) *KafkaHandler {
 	return &KafkaHandler{
-		ctx:             ctx,
 		sub:             sub,
 		mapTopicHandler: make(map[string]Handler),
 	}
@@ -33,8 +31,8 @@ func (h *KafkaHandler) Register(topic string, handler Handler) {
 	h.mapTopicHandler[topic] = handler
 }
 
-func (h *KafkaHandler) Run() error {
-	cMsg, err := h.sub.Run(h.ctx)
+func (h *KafkaHandler) Run(ctx context.Context) error {
+	cMsg, err := h.sub.Run(ctx)
 	if err != nil {
 		return err
 	}

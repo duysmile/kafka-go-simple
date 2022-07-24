@@ -27,14 +27,14 @@ func main() {
 	sub := kafka.NewSrmSubscriber(logger, brokers, "kafka-test")
 
 	mainCtx := context.Background()
-	runner := pubsub.NewKafkaConsumeRunner(mainCtx, sub)
+	runner := pubsub.NewKafkaConsumeRunner(sub)
 
 	testWorker := NewTestHandler(true)
 	runner.Register("test-1", testWorker)
 	runner.Register("test-2", testWorker)
 	runner.Register("test-3", testWorker)
 
-	if err := runner.Run(); err != nil {
+	if err := runner.Run(mainCtx); err != nil {
 		log.Fatal("failed to consuming", err)
 	}
 
